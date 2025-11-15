@@ -1,0 +1,19 @@
+version: "3.5"
+services:
+  chatgptbot:
+    container_name: chatgptbot
+    image: yym68686/chatgpt:latest
+    environment:
+      - BOT_TOKEN=
+      - BASE_URL=
+      - API_KEY=
+      - MODEL=gpt-4o
+      - CUSTOM_MODELS=-all,gpt-4o
+      - NICK=@openConference1bot
+      - REPLY=true
+      - CHAT_MODE=global
+      - SYSTEMPROMPT=参考https://open-conference.vercel.app/这个网页的内容回复用户回答并且鼓励交流
+    volumes:
+      - ./user_configs:/home/user_configs
+    ports:
+      - 8080:8080
