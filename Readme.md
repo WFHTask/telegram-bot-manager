@@ -74,9 +74,13 @@ docker run -p 8080:8080 --name chatbot -dit \
 
 ### 方式二：使用本仓库 Dockerfile 构建自定义镜像
 
+**步骤 1：在项目根目录构建镜像**
+
 ```bash
 docker build -t chatgptbot-custom .
 ```
+
+**步骤 2（Windows / PowerShell）：运行容器**
 
 ```powershell
 docker run -p 8080:8080 --name chatbot -dit `
@@ -84,6 +88,8 @@ docker run -p 8080:8080 --name chatbot -dit `
     -v ${PWD}/user_configs:/home/user_configs `
     chatgptbot-custom
 ```
+
+**步骤 2（Linux / macOS）：运行容器**
 
 ```bash
 docker run -p 8080:8080 --name chatbot -dit \
