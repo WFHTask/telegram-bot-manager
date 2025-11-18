@@ -13,7 +13,6 @@ ENV BOT_TOKEN="" \
 
 # 预创建配置目录（运行容器时仍可通过 -v 进行挂载）
 RUN mkdir -p /home/user_configs
-VOLUME ["/home/user_configs"]
 
 # 镜像本身已包含启动命令，这里只需公开服务端口
 EXPOSE 8080
