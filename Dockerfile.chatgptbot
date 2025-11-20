@@ -1,0 +1,17 @@
+# chatgptbot 服务的 Dockerfile
+# 用于 Railway 部署
+
+FROM yym68686/chatgpt:latest
+
+# 创建配置目录
+RUN mkdir -p /home/user_configs
+
+# 复制用户配置（可选）
+COPY user_configs/global.json /home/user_configs/global.json
+
+# 暴露端口
+EXPOSE 8080
+
+# chatgptbot 会从环境变量读取配置
+# 所有配置都通过环境变量传入，无需额外操作
+

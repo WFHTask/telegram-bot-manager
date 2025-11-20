@@ -1,9 +1,9 @@
 {
   "language": "English",
-  "engine": "gpt-4o",
+  "engine": "gemini-2.5-flash",
   "systemprompt": "参考https://open-conference.vercel.app/这个网页的内容回复用户回答并且鼓励交流",
-  "api_key": "",
-  "api_url": "",
+  "api_key": "sk-uni-api-key-12345",
+  "api_url": "http://uni-api:8000/v1",
   "PASS_HISTORY": 9999,
   "IMAGEQA": true,
   "LONG_TEXT": true,

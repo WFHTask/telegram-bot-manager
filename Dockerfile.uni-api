@@ -1,0 +1,19 @@
+# uni-api 服务的 Dockerfile
+# 用于 Railway 部署
+
+FROM yym68686/uni-api:latest
+
+# 注意：不创建 /home/data 目录，禁用统计数据功能
+# 如果需要统计数据，取消注释下面这行：
+# RUN mkdir -p /home/data
+
+# 复制配置文件（如果存在）
+# 注意：Railway 可以通过环境变量 CONFIG_URL 或挂载配置文件
+COPY api.yaml /home/api.yaml
+
+# 暴露端口
+EXPOSE 8000
+
+# uni-api 会自动从 /home/api.yaml 读取配置
+# 或通过 CONFIG_URL 环境变量下载远程配置
+

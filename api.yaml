@@ -1,0 +1,25 @@
+providers:
+  - provider: gemini
+    base_url: https://generativelanguage.googleapis.com/v1beta
+    api:   # 请替换为你的 Gemini API Key
+    model:
+      - gemini-1.5-pro-latest
+      - gemini-1.5-pro
+      - gemini-1.5-flash-latest
+      - gemini-1.5-flash
+      - gemini-2.5-flash
+
+  - provider: openai
+    base_url: https://api.baicaigpt.cn/v1/chat/completions
+    api:   # 请替换为你的 OpenAI API Key
+    model:
+      - gpt-4o
+      - gpt-4o-mini
+      - gpt-4-turbo
+      - gpt-4
+      - gpt-3.5-turbo
+
+api_keys:
+  - api: sk-uni-api-key-12345  # uni-api 的 API Key，Telegram Bot 将使用此 Key 访问 uni-api
+    # 该 API Key 可以使用所有模型
+

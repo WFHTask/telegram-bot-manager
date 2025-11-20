@@ -1,14 +1,28 @@
-version: "3.5"
 services:
+  # uni-api 服务：统一管理多个 AI 模型 API（支持 Gemini、OpenAI 等）
+  uni-api:
+    container_name: uni-api
+    image: yym68686/uni-api:latest
+    user: root
+    volumes:
+      - ./api.yaml:/home/api.yaml  # uni-api 期望配置文件在 /home/api.yaml
+      # - ./uniapi_db:/home/data  # 统计数据目录（已禁用，不需要统计数据）
+    ports:
+      - 8000:8000  # uni-api 默认端口是 8000
+    restart: unless-stopped
+
+  # Telegram Bot 服务
   chatgptbot:
     container_name: chatgptbot
     image: yym68686/chatgpt:latest
+    depends_on:
+      - uni-api  # 简单依赖，等待 uni-api 容器启动即可
     environment:
       - BOT_TOKEN=
-      - BASE_URL=
-      - API_KEY=
-      - MODEL=gpt-4o
-      - CUSTOM_MODELS=-all,gpt-4o
+      - BASE_URL=http://uni-api:8000/v1  # 指向 uni-api 服务（必须包含 /v1 前缀）
+      - API_KEY=sk-uni-api-key-12345  # uni-api 配置的 API Key（需与 api.yaml 中的 api_keys 一致）
+      - MODEL=gemini-2.5-flash  # 使用 gpt-4o 模型
+      - CUSTOM_MODELS=-all,gemini-1.5-pro-latest,gemini-1.5-pro,gemini-1.5-flash-latest,gemini-1.5-flash,gemini-2.5-flash,gpt-4o,gpt-4o-mini,gpt-4-turbo,gpt-3.5-turbo
       - NICK=@openConference1bot
       - REPLY=true
       - CHAT_MODE=global
@@ -16,4 +30,5 @@ services:
     volumes:
       - ./user_configs:/home/user_configs
     ports:
-      - 8080:8080
+      - 8080:8080  # Telegram Bot 端口
+    restart: unless-stopped
