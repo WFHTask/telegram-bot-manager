@@ -110,9 +110,63 @@ Railway Project
      - 用于保存 uni-api 的统计数据
    - **注意**：默认不启用统计数据，可以跳过此步骤
 
-6. **环境变量（可选）**
-   - 如果使用远程配置文件，添加：
-     - `CONFIG_URL`: 远程配置文件 URL（例如 GitHub Gist 直链）
+6. **配置文件方式（二选一）**
+
+   **方法一：使用远程配置文件（推荐）⭐**
+
+   优点：更新配置无需重新构建镜像，只需修改远程文件并重启服务
+
+   步骤：
+   
+   1. **上传配置文件到云存储**
+      - 创建 GitHub Gist（推荐）
+        - 访问 https://gist.github.com
+        - 创建新的 Gist，文件名：`api.yaml`
+        - 复制 `api.yaml` 的内容到 Gist
+        - 选择 "Create secret gist"（私有）或 "Create public gist"（公开）
+        - 点击 "Create secret gist" 或 "Create public gist"
+      - 或使用其他云存储服务（如 Google Drive、Dropbox 等，需要提供直链）
+   
+   2. **获取配置文件直链**
+      - 在 Gist 页面，点击 "Raw" 按钮
+      - 复制浏览器地址栏的 URL
+      - 示例：`https://gist.githubusercontent.com/用户名/gist-id/raw/文件hash/api.yaml`
+      - **格式**：`https://gist.githubusercontent.com/用户名/gist-id/raw/分支名或hash/api.yaml`
+   
+   3. **在 Railway 中设置环境变量**
+      - Settings → Variables
+      - 添加变量：`CONFIG_URL` = `你获取的直链URL`
+      - 示例：`CONFIG_URL=https://gist.githubusercontent.com/username/gistid/raw/hash/api.yaml`
+   
+   4. **部署后验证**
+      - uni-api 启动时会自动从 `CONFIG_URL` 下载并加载配置
+      - 更新配置时：修改 Gist 中的文件 → 在 Railway 重启服务即可
+
+   ---
+
+   **方法二：使用本地配置文件（备选方案）**
+
+   优点：配置文件打包在镜像中，不依赖外部服务
+
+   步骤：
+
+   1. **修改 Dockerfile.uni-api**
+      - 取消注释 `COPY api.yaml /home/api.yaml` 这一行
+      - 注释掉或忽略 `CONFIG_URL` 环境变量的使用
+   
+   2. **确保 api.yaml 在仓库中**
+      - 确保 `api.yaml` 文件在 Git 仓库根目录
+      - ⚠️ **注意**：不要将包含真实 API Key 的文件提交到公开仓库
+   
+   3. **部署**
+      - Railway 会自动构建镜像，将 `api.yaml` 复制到镜像中
+      - 无需设置 `CONFIG_URL` 环境变量
+   
+   4. **更新配置时**
+      - 需要修改 `api.yaml` 后重新构建镜像
+      - 在 Railway 中触发重新部署
+
+   **推荐使用方法一（远程配置）**，因为更新配置更方便快捷。
 
 #### 步骤 2：部署 chatgptbot 服务
 
@@ -159,12 +213,25 @@ Railway Project
 
 | 变量名 | 说明 | 是否必需 | 默认值 | 示例 |
 |--------|------|---------|--------|------|
-| `CONFIG_URL` | 远程配置文件 URL | 否 | - | `https://gist.githubusercontent.com/xxx/api.yaml` |
+| `CONFIG_URL` | 远程配置文件 URL | 视方法而定 | - | `https://gist.githubusercontent.com/xxx/api.yaml` |
 
 **说明：**
-- 如果使用 `Dockerfile.uni-api`，配置文件会在构建时 `COPY` 到镜像中，无需此环境变量
-- 如果使用远程配置文件，设置此变量后，uni-api 会自动下载并加载配置
-- 配置文件格式见 `api.yaml` 示例
+- **方法一（远程配置 - 推荐）**：✅ **必须设置** `CONFIG_URL` 环境变量
+  - uni-api 启动时会从该 URL 自动下载并加载配置
+  - **推荐使用 GitHub Gist** 存储配置文件：
+    1. 创建 Gist（public 或 secret）
+    2. 点击 "Raw" 按钮获取直链
+    3. 将直链 URL 设置为 `CONFIG_URL` 环境变量
+  - **优点**：更新配置无需重新构建镜像，只需修改远程文件并重启服务
+  - 配置文件格式见 `api.yaml` 示例
+
+- **方法二（本地配置）**：❌ **不需要** `CONFIG_URL` 环境变量
+  - 需要在 `Dockerfile.uni-api` 中取消注释 `COPY api.yaml /home/api.yaml`
+  - 配置文件在构建时打包到镜像中
+  - **优点**：配置打包在镜像中，不依赖外部服务
+  - **缺点**：更新配置需要重新构建镜像
+
+- ⚠️ **安全提醒**：不要将包含真实 API Key 的配置文件提交到公开仓库
 
 ### chatgptbot 服务环境变量
 
@@ -237,8 +304,13 @@ Railway Project
 `api.yaml` 用于配置 uni-api 的 AI 模型提供商和 API Keys。
 
 **文件位置：**
-- Docker Compose: `./api.yaml`（挂载到容器）
-- Railway: 构建时 `COPY` 到镜像，或通过 `CONFIG_URL` 远程加载
+- **Docker Compose**: `./api.yaml`（挂载到容器 `/home/api.yaml`）
+- **Railway 方法一（远程配置 - 推荐）**：通过 `CONFIG_URL` 环境变量从远程 URL 加载
+  - 推荐使用 GitHub Gist 存储配置文件
+  - 或其他支持直链的云存储服务
+- **Railway 方法二（本地配置）**：构建时通过 `COPY api.yaml /home/api.yaml` 打包到镜像中
+  - 配置文件需要在 Git 仓库中
+  - ⚠️ **注意**：不要将包含真实 API Key 的文件提交到公开仓库
 
 **配置示例：**
 
@@ -303,8 +375,19 @@ docker compose logs -f uni-api
 - **必须包含 `/v1` 前缀**
 
 **Q: 如何更新配置文件？**
-- 如果使用 Dockerfile：修改 `api.yaml` 后重新构建镜像
-- 如果使用 `CONFIG_URL`：更新远程文件，重启服务
+
+- **方法一（远程配置 - 推荐）**：
+  1. 在 GitHub Gist（或你使用的云存储）中修改 `api.yaml` 文件
+  2. 在 Railway 中重启 uni-api 服务：
+     - Settings → Deployments → 点击最新部署右侧的 "..." → Restart
+     - 或使用 Railway CLI：`railway restart`
+  3. **优点**：无需重新构建镜像，配置更新更方便快捷
+
+- **方法二（本地配置）**：
+  1. 在本地修改 `api.yaml` 文件
+  2. 提交到 Git 仓库
+  3. 在 Railway 中触发重新部署（会自动重新构建镜像）
+  4. **缺点**：每次更新配置都需要重新构建镜像，耗时较长
 
 **Q: 如何重置泄露的 API Key？**
 - **BOT_TOKEN**: 在 [@BotFather](https://t.me/BotFather) 中撤销旧 Token，生成新 Token

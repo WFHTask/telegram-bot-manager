@@ -7,13 +7,29 @@ FROM yym68686/uni-api:latest
 # 如果需要统计数据，取消注释下面这行：
 # RUN mkdir -p /home/data
 
-# 复制配置文件（如果存在）
-# 注意：Railway 可以通过环境变量 CONFIG_URL 或挂载配置文件
-COPY api.yaml /home/api.yaml
+# 配置文件方式（二选一）：
+#
+# 方法一：使用远程配置文件（推荐）⭐
+#   - 不取消注释下面的 COPY 命令
+#   - 在 Railway 环境变量中设置 CONFIG_URL
+#   - 例如：CONFIG_URL=https://gist.githubusercontent.com/xxx/api.yaml
+#   - 优点：更新配置无需重新构建镜像，只需修改远程文件并重启服务
+#
+# 方法二：使用本地配置文件（备选）
+#   - 取消注释下面的 COPY 命令
+#   - 确保 api.yaml 在 Git 仓库根目录
+#   - 无需设置 CONFIG_URL 环境变量
+#   - 优点：配置打包在镜像中，不依赖外部服务
+#   - 缺点：更新配置需要重新构建镜像
+
+# 方式一（远程配置）：已注释，使用 CONFIG_URL 环境变量
+# 方式二（本地配置）：取消注释下面的行以启用
+# COPY api.yaml /home/api.yaml
 
 # 暴露端口
 EXPOSE 8000
 
-# uni-api 会自动从 /home/api.yaml 读取配置
-# 或通过 CONFIG_URL 环境变量下载远程配置
+# uni-api 启动优先级：
+# 1. 如果设置了 CONFIG_URL 环境变量，从远程下载配置
+# 2. 如果存在 /home/api.yaml 文件，使用本地配置文件
 
