@@ -1,7 +1,7 @@
 providers:
   - provider: gemini
     base_url: https://generativelanguage.googleapis.com/v1beta
-    api: AIzaSyCk7CIfnRyIMekw5ZQDivu_5AFt22lb-B8   # 请替换为你的 Gemini API Key
+    api:    # 请替换为你的 Gemini API Key
     model:
       - gemini-1.5-pro-latest
       - gemini-1.5-pro
@@ -11,7 +11,7 @@ providers:
 
   - provider: openai
     base_url: https://api.baicaigpt.cn/v1/chat/completions
-    api: sk-bwiLZ7RopfQvRVsfTlAFOw2PuwRVTafqxh0HArrZJa1Up   # 请替换为你的 OpenAI API Key
+    api:    # 请替换为你的 OpenAI API Key
     model:
       - gpt-4o
       - gpt-4o-mini
